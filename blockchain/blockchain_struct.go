@@ -2,9 +2,11 @@ package blockchain
 
 import (
 	"encoding/json"
+	"log"
 	"strings"
 
 	"github.com/obynonwane/evoblockchain/constants"
+	"github.com/obynonwane/evoblockchain/utilities"
 )
 
 type BlockchainStruct struct {
@@ -33,18 +35,24 @@ func (bc *BlockchainStruct) AddBlock(b *Block) {
 	//TODO: add a block to the blockchain
 	m := map[string]bool{}
 
-	// pick the last block in the chain and range over the transactions in it
-	for _, txn := range bc.Blocks[len(bc.Blocks)-1].Transactions {
-		// add the hash of the transaction inside the block in a map above
+	//  range over the transactions in the given block
+	for _, txn := range b.Transactions {
+		// push the hashes of the transaction to above map
 		m[txn.Hash()] = true
 	}
 
 	// loop through the TransactionPool
-	for _, txn := range bc.TransactionPool {
+	for idx, txn := range bc.TransactionPool {
+		// check if transaction exist in the above map
 		_, ok := m[txn.TransactionHash]
-		if !ok {
+		if ok {
+			// remove the transaction with the hash from transaction pool
+			bc.TransactionPool = append(bc.TransactionPool[:idx], bc.TransactionPool[idx+1:]...)
 		}
 	}
+
+	// add block to blockchain
+	bc.Blocks = append(bc.Blocks, b)
 }
 
 // Add transaction to transaction pool
@@ -59,7 +67,7 @@ func (bc *BlockchainStruct) ProofOfWorkMinning(minersAddress string) {
 	nonce := 0
 	for {
 
-		// create a nw Block
+		// create a new Block
 		guessBlock := NewBlock(prevHash, nonce)
 
 		//copy the transaction pool
@@ -77,18 +85,17 @@ func (bc *BlockchainStruct) ProofOfWorkMinning(minersAddress string) {
 
 		if ourSolutionHash == desiredHash {
 			// reward the miner
-			rewardTxn := NewTransaction(
-				constants.BLOCKCHAIN_ADDRESS,
-				minersAddress,
-				constants.MINING_REWARD,
-				[]byte{},
-			)
+			rewardTxn := NewTransaction(constants.BLOCKCHAIN_ADDRESS, minersAddress, constants.MINING_REWARD, []byte{})
+			rewardTxn.Status = constants.SUCCESS
 			// add the reward transaction to block - custom way, so it those not go through validation
 			guessBlock.Transactions = append(guessBlock.Transactions, rewardTxn)
 
 			// the the Block
 			bc.AddBlock(guessBlock)
+			log.Println(bc.ToJson(), "\n\n")
 
+			utilities.PrettyLog("Blockchain", bc)
+			// log.Println("\n\n\n")
 			prevHash = bc.Blocks[len(bc.Blocks)-1].Hash() // extract the last block
 			nonce = 0                                     // reset nonce mining has been done by miner
 			continue                                      // jumps back to the top of the loop, start afresh

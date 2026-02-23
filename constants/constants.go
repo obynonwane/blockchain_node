@@ -5,7 +5,7 @@ const (
 	HEX_PREFIX         = "0x"
 	SUCCESS            = "success"
 	FAILED             = "failed"
-	MINING_DIFFICULTY  = 4
+	MINING_DIFFICULTY  = 5
 	MINING_REWARD      = 1200 * DECIMAL
 	CURRENCY_NAME      = "evo"
 	DECIMAL            = 100

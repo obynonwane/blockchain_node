@@ -2,6 +2,8 @@ package main
 
 import (
 	"log"
+	"sync"
+	"time"
 
 	"github.com/obynonwane/evoblockchain/blockchain"
 	"github.com/obynonwane/evoblockchain/constants"
@@ -13,17 +15,19 @@ func init() {
 
 func main() {
 
-	transaction := blockchain.NewTransaction("0x1", "0x2", 1, []byte{})
-	log.Println("TRANSACTION", transaction.ToJson())
+	var wg sync.WaitGroup
 
-	block := blockchain.NewBlock("0x", 9)
-	log.Println("BLOCK", block.ToJson())
-
-	transaction1 := blockchain.NewTransaction("0x1", "0x2", 1, []byte{})
-	genesisBlock := blockchain.NewBlock("0x", 100)
-	genesisBlock.Transactions = append(genesisBlock.Transactions, transaction1)
+	genesisBlock := blockchain.NewBlock("0x0", 0)
+	transaction1 := blockchain.NewTransaction("0x1", "0x2", 12, []byte{})
 	blockchain := blockchain.NewBlockchain(*genesisBlock)
-	log.Println("BLOCKCHAIN", blockchain.ToJson())
-	log.Println("HASH OF BLOCK", block.Hash())
+	log.Println(blockchain.ToJson())
+	wg.Add(1)
 
+	//simulates proof or work continuously running and adding blocks
+	go blockchain.ProofOfWorkMinning("alice")
+	time.Sleep(2000)
+	// simulates user sending transaction
+	blockchain.AddTransactionTotransactionPool(*transaction1)
+	log.Println("Transaction Pool", blockchain.ToJson())
+	wg.Wait()
 }
