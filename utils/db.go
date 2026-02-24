@@ -64,5 +64,4 @@ func KeyExists() (bool, error) {
 
 	exists, err := db.Has([]byte(constants.BLOCKCHAIN_KEY), nil)
 	return exists, err
-
 }
