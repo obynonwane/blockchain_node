@@ -67,11 +67,21 @@ func (bc *BlockchainStruct) AddBlock(b *Block) {
 
 	// add block to blockchain
 	bc.Blocks = append(bc.Blocks, b)
+	//save the block to database
+	err := PutIntoDb(*bc)
+	if err != nil {
+		panic(err.Error())
+	}
 }
 
 // Add transaction to transaction pool
 func (bc *BlockchainStruct) AddTransactionTotransactionPool(transaction Transaction) {
 	bc.TransactionPool = append(bc.TransactionPool, &transaction)
+	//save the block to database
+	err := PutIntoDb(*bc)
+	if err != nil {
+		panic(err.Error())
+	}
 }
 
 func (bc *BlockchainStruct) ProofOfWorkMinning(minersAddress string) {
@@ -108,13 +118,11 @@ func (bc *BlockchainStruct) ProofOfWorkMinning(minersAddress string) {
 			bc.AddBlock(guessBlock)
 			log.Println(bc.ToJson(), "\n\n")
 
-			// utilities.PrettyLog("Blockchain", bc)
-			// log.Println("\n\n\n")
 			prevHash = bc.Blocks[len(bc.Blocks)-1].Hash() // extract the last block
 			nonce = 0                                     // reset nonce mining has been done by miner
 			continue                                      // jumps back to the top of the loop, start afresh
 		}
 		nonce++
 	}
-	//compare this hash with the mining difficulty
+
 }
