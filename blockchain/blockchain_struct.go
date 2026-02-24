@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/obynonwane/evoblockchain/constants"
-	"github.com/obynonwane/evoblockchain/utilities"
 )
 
 type BlockchainStruct struct {
@@ -94,7 +93,7 @@ func (bc *BlockchainStruct) ProofOfWorkMinning(minersAddress string) {
 			bc.AddBlock(guessBlock)
 			log.Println(bc.ToJson(), "\n\n")
 
-			utilities.PrettyLog("Blockchain", bc)
+			// utilities.PrettyLog("Blockchain", bc)
 			// log.Println("\n\n\n")
 			prevHash = bc.Blocks[len(bc.Blocks)-1].Hash() // extract the last block
 			nonce = 0                                     // reset nonce mining has been done by miner
