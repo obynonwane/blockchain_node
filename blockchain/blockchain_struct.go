@@ -14,11 +14,26 @@ type BlockchainStruct struct {
 }
 
 func NewBlockchain(genesisBlock Block) *BlockchainStruct {
-	blockchainStruct := new(BlockchainStruct)
-	blockchainStruct.TransactionPool = []*Transaction{}
-	blockchainStruct.Blocks = []*Block{}
-	blockchainStruct.Blocks = append(blockchainStruct.Blocks, &genesisBlock)
-	return blockchainStruct
+	exists, _ := KeyExists()
+	if exists {
+
+		blockchainStruct, err := GetBlockchain()
+		if err != nil {
+			panic(err.Error())
+		}
+		return blockchainStruct
+
+	} else {
+		blockchainStruct := new(BlockchainStruct)
+		blockchainStruct.TransactionPool = []*Transaction{}
+		blockchainStruct.Blocks = []*Block{}
+		blockchainStruct.Blocks = append(blockchainStruct.Blocks, &genesisBlock)
+		err := PutIntoDb(*blockchainStruct)
+		if err != nil {
+			panic(err.Error())
+		}
+		return blockchainStruct
+	}
 }
 
 func (bc BlockchainStruct) ToJson() string {

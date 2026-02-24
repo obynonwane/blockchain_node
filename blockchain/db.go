@@ -1,15 +1,14 @@
-package utils
+package blockchain
 
 import (
 	"encoding/json"
 
-	"github.com/obynonwane/evoblockchain/blockchain"
 	"github.com/obynonwane/evoblockchain/constants"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
 // using level db = add blockchain
-func PutIntoDb(bc blockchain.BlockchainStruct) error {
+func PutIntoDb(bc BlockchainStruct) error {
 
 	db, err := leveldb.OpenFile(constants.BLOCKCHAIN_DB_PATH, nil)
 	if err != nil {
@@ -31,7 +30,7 @@ func PutIntoDb(bc blockchain.BlockchainStruct) error {
 	return nil
 }
 
-func GetBlockchain() (*blockchain.BlockchainStruct, error) {
+func GetBlockchain() (*BlockchainStruct, error) {
 	db, err := leveldb.OpenFile(constants.BLOCKCHAIN_DB_PATH, nil)
 	if err != nil {
 		return nil, err
@@ -44,7 +43,7 @@ func GetBlockchain() (*blockchain.BlockchainStruct, error) {
 		return nil, err
 	}
 
-	var bc blockchain.BlockchainStruct
+	var bc BlockchainStruct
 	err = json.Unmarshal(data, &bc)
 	if err != nil {
 		return nil, err
