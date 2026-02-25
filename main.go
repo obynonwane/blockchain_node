@@ -20,6 +20,7 @@ func main() {
 	blockchain := blockchain.NewBlockchain(*genesisBlock)
 	log.Println(blockchain.ToJson())
 	log.Println("Starting Mining", "\n\n")
+
 	wg.Add(1)
 
 	//simulates proof or work continuously running and adding blocks

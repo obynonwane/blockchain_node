@@ -14,25 +14,32 @@ type BlockchainStruct struct {
 }
 
 func NewBlockchain(genesisBlock Block) *BlockchainStruct {
+
+	// get key since using single key
 	exists, _ := KeyExists()
 	if exists {
 
+		// if key exist get the entire blockchain
 		blockchainStruct, err := GetBlockchain()
 		if err != nil {
 			panic(err.Error())
 		}
+
+		// then return it
 		return blockchainStruct
 
 	} else {
+
+		// if key do not exist create new blockchain
 		blockchainStruct := new(BlockchainStruct)
-		blockchainStruct.TransactionPool = []*Transaction{}
-		blockchainStruct.Blocks = []*Block{}
-		blockchainStruct.Blocks = append(blockchainStruct.Blocks, &genesisBlock)
-		err := PutIntoDb(*blockchainStruct)
+		blockchainStruct.TransactionPool = []*Transaction{}                      // initialise emtyp tx pool
+		blockchainStruct.Blocks = []*Block{}                                     // initialise empty block
+		blockchainStruct.Blocks = append(blockchainStruct.Blocks, &genesisBlock) // append genesis block to bc struct
+		err := PutIntoDb(*blockchainStruct)                                      // save to levelDB
 		if err != nil {
 			panic(err.Error())
 		}
-		return blockchainStruct
+		return blockchainStruct // return saved blockchainstruct, containing genesis stuff
 	}
 }
 
@@ -116,7 +123,8 @@ func (bc *BlockchainStruct) ProofOfWorkMinning(minersAddress string) {
 
 			// the the Block
 			bc.AddBlock(guessBlock)
-			log.Println(bc.ToJson(), "\n\n")
+			// log.Println(bc.ToJson(), "\n\n")
+			log.Println("TOTAL CRYPTO", bc.CalculateTotalCrypto("bob"))
 
 			prevHash = bc.Blocks[len(bc.Blocks)-1].Hash() // extract the last block
 			nonce = 0                                     // reset nonce mining has been done by miner
@@ -125,4 +133,24 @@ func (bc *BlockchainStruct) ProofOfWorkMinning(minersAddress string) {
 		nonce++
 	}
 
+}
+
+func (bc BlockchainStruct) CalculateTotalCrypto(address string) uint64 {
+
+	sum := int64(0)
+
+	for _, blocks := range bc.Blocks {
+		for _, txns := range blocks.Transactions {
+			if txns.Status == constants.SUCCESS {
+				if txns.To == address {
+					sum += int64(txns.Value)
+				} else if txns.From == address {
+					sum -= int64(txns.Value)
+				}
+			}
+
+		}
+	}
+
+	return uint64(sum)
 }

@@ -25,8 +25,8 @@ func NewTransaction(from, to string, value uint64, data []byte) *Transaction {
 	t.To = to
 	t.Value = value
 	t.Data = data
+	t.Status = constants.PENDING
 	t.TransactionHash = t.Hash()
-
 	return t
 }
 

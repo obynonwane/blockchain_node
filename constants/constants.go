@@ -4,6 +4,7 @@ const (
 	BLOCKCHAIN_NAME    = "Evoblockchain"
 	HEX_PREFIX         = "0x"
 	SUCCESS            = "success"
+	PENDING            = "pending"
 	FAILED             = "failed"
 	MINING_DIFFICULTY  = 5
 	MINING_REWARD      = 1200 * DECIMAL
