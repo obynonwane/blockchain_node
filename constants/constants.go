@@ -13,4 +13,5 @@ const (
 	BLOCKCHAIN_ADDRESS = "Evoblockchain_Faucet"
 	BLOCKCHAIN_DB_PATH = "database/evodb"
 	BLOCKCHAIN_KEY     = "blockchain_key"
+	ADDRESS_PREFIX     = "evochain"
 )

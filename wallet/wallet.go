@@ -4,7 +4,11 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/sha256"
 	"fmt"
+	"math/big"
+
+	"github.com/obynonwane/evoblockchain/constants"
 )
 
 type Wallet struct {
@@ -32,4 +36,39 @@ func (w *Wallet) GetPrivateKeyHex() string {
 
 func (w *Wallet) GetPublicKeyHex() string {
 	return fmt.Sprintf("0x%x%x", w.PublicKey.X, w.PublicKey.Y)
+}
+
+func (w *Wallet) GetAddress() string {
+	// slice it  to remove the 0x appended in the method GetPublicKeyHex
+	hash := sha256.Sum256([]byte(w.GetPublicKeyHex()[2:]))
+
+	// convert the byte slice to hexadecimal hash
+	hex := fmt.Sprintf("%x", hash[:])
+
+	// take the last 40 characters - which will now become the wallet address
+	// added ADDRESS_PREFIX  to make the address fancy
+	address := constants.ADDRESS_PREFIX + hex[len(hex)-40:]
+
+	return address
+}
+
+// convert the private key hex to actuall wallet
+func NewWalletFromPrivateKeyHex(privateKeyHex string) *Wallet {
+	// start from second index ignoring or skiping 0x i.e the 0th and 1st index
+	pk := privateKeyHex[2:]
+
+	// convert private to to big int
+	d := new(big.Int)   // aloocates memory for a bigint
+	d.SetString(pk, 16) // interpret the string hex as base 16 input, because it actually a big number represented as Hex
+
+	var npk ecdsa.PrivateKey
+	npk.D = d
+	npk.PublicKey.Curve = elliptic.P256()
+	npk.PublicKey.X, npk.PublicKey.Y = npk.PublicKey.Curve.ScalarBaseMult(d.Bytes())
+
+	wallet := new(Wallet)
+	wallet.PrivateKey = &npk
+	wallet.PublicKey = &npk.PublicKey
+
+	return wallet
 }
