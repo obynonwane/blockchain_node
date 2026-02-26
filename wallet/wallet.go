@@ -5,9 +5,11 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"math/big"
 
+	"github.com/obynonwane/evoblockchain/blockchain"
 	"github.com/obynonwane/evoblockchain/constants"
 )
 
@@ -50,6 +52,38 @@ func (w *Wallet) GetAddress() string {
 	address := constants.ADDRESS_PREFIX + hex[len(hex)-40:]
 
 	return address
+}
+
+func (w *Wallet) GetSignedTxn(unsignedTxn blockchain.Transaction) (*blockchain.Transaction, error) {
+
+	// get the bytes of the unsignedTxn
+	bs, err := json.Marshal(unsignedTxn)
+	if err != nil {
+		return nil, err
+	}
+
+	// get the hash of the bytes of unsignedTxn
+	hash := sha256.Sum256(bs)
+
+	// sign the unsignedTxn hash
+	sig, err := ecdsa.SignASN1(rand.Reader, w.PrivateKey, hash[:])
+	if err != nil {
+		return nil, err
+	}
+
+	// return the signed signed transaction
+	var signedTxn blockchain.Transaction
+	signedTxn.From = unsignedTxn.From
+	signedTxn.To = unsignedTxn.To
+	signedTxn.Data = unsignedTxn.Data
+	signedTxn.Status = unsignedTxn.Status
+	signedTxn.Value = unsignedTxn.Value
+	signedTxn.TransactionHash = unsignedTxn.TransactionHash
+	signedTxn.Signature = sig
+	signedTxn.PublicKey = w.GetPublicKeyHex()
+
+	return &signedTxn, nil
+
 }
 
 // convert the private key hex to actuall wallet

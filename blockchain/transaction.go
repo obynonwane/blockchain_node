@@ -16,6 +16,8 @@ type Transaction struct {
 	Data            []byte `json:"data"`
 	Status          string `json:"status"`
 	TransactionHash string `json:"transaction_hash"`
+	PublicKey       string `json:"public_key,omitempty"`
+	Signature       []byte `json:"signature"`
 }
 
 func NewTransaction(from, to string, value uint64, data []byte) *Transaction {
