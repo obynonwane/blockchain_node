@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"crypto/ecdsa"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -71,4 +72,21 @@ func (t Transaction) Hash() string {
 
 	formattedHexRep := constants.HEX_PREFIX + hexRep
 	return formattedHexRep
+}
+
+func (t *Transaction) VerifySignature() bool {
+	signature := t.Signature
+	publicKeyHex := t.PublicKey
+	t.Signature = []byte{} // because signature have to be excluded in hashing transaction
+	t.PublicKey = ""
+	publicKeyEcdsa := GetPublicKeyFromhex(publicKeyHex)
+
+	// conver the transaction to byte slice
+	bs, _ := json.Marshal(t)
+	// conver the byte slice to hash
+	hash := sha256.Sum256(bs)
+
+	// verify the signature
+	valid := ecdsa.VerifyASN1(publicKeyEcdsa, hash[:], signature)
+	return valid
 }

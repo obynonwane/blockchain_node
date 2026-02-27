@@ -54,6 +54,7 @@ func (w *Wallet) GetAddress() string {
 	return address
 }
 
+// Function to sign transaction
 func (w *Wallet) GetSignedTxn(unsignedTxn blockchain.Transaction) (*blockchain.Transaction, error) {
 
 	// get the bytes of the unsignedTxn
