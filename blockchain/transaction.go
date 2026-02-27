@@ -29,6 +29,8 @@ func NewTransaction(from, to string, value uint64, data []byte) *Transaction {
 	t.Data = data
 	t.Status = constants.PENDING
 	t.TransactionHash = t.Hash()
+	t.PublicKey = ""
+	t.Signature = []byte{}
 	return t
 }
 

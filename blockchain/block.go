@@ -1,9 +1,12 @@
 package blockchain
 
 import (
+	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"math/big"
 	"time"
 
 	"github.com/obynonwane/evoblockchain/constants"
@@ -63,4 +66,28 @@ func (b *Block) AddTransactionToBlock(txn *Transaction) {
 	}
 
 	b.Transactions = append(b.Transactions, txn)
+}
+
+// To verify the transaction we need to convert the
+// public key hex  back to ecdsa format
+func GetPublicKeyFromhex(publicKeyHex string) *ecdsa.PublicKey {
+	rpk := publicKeyHex[2:] //skips the first 2 characters (0x) attached to the public key
+	xHex := rpk[:64]        // starts from begining to 64 index
+	yHex := rpk[64:]        // starts from 64th index to the end
+
+	// to ge the X & Y on the eliptive curve - they are Big integer
+	x := new(big.Int)     // aloocates memory for a bigint
+	x.SetString(xHex, 16) // interpret the string hex as base 16 input, because it actually a big number represented as Hex
+
+	y := new(big.Int)
+	y.SetString(yHex, 16)
+
+	var npk ecdsa.PublicKey
+
+	npk.Curve = elliptic.P256()
+	npk.X = x
+	npk.Y = y
+
+	return &npk
+
 }
