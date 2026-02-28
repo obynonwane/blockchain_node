@@ -83,7 +83,7 @@ func (t *Transaction) VerifySignature() bool {
 	publicKeyHex := t.PublicKey
 	t.Signature = []byte{} // because signature have to be excluded in hashing transaction
 	t.PublicKey = ""
-	publicKeyEcdsa := GetPublicKeyFromhex(publicKeyHex)
+	publicKeyEcdsa := GetPublicKeyFromHex(publicKeyHex)
 
 	// conver the transaction to byte slice
 	bs, _ := json.Marshal(t)

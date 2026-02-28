@@ -70,7 +70,7 @@ func (b *Block) AddTransactionToBlock(txn *Transaction) {
 
 // To verify the transaction we need to convert the
 // public key hex  back to ecdsa format
-func GetPublicKeyFromhex(publicKeyHex string) *ecdsa.PublicKey {
+func GetPublicKeyFromHex(publicKeyHex string) *ecdsa.PublicKey {
 	rpk := publicKeyHex[2:] //skips the first 2 characters (0x) attached to the public key
 	xHex := rpk[:64]        // starts from begining to 64 index
 	yHex := rpk[64:]        // starts from 64th index to the end
