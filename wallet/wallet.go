@@ -88,7 +88,8 @@ func (w *Wallet) GetSignedTxn(unsignedTxn blockchain.Transaction) (*blockchain.T
 }
 
 // convert the private key hex to actuall wallet
-// also basically converting the private key hex back to ecdsa.Private key format
+// basically converting the private key hex to ecdsa & deriving publick key from the private key
+// returning everything in ecdsa format in the wallet struct
 func NewWalletFromPrivateKeyHex(privateKeyHex string) *Wallet {
 	// start from second index ignoring or skiping 0x i.e the 0th and 1st index
 	pk := privateKeyHex[2:] // skips the first 2 index i.e (0x in the privateKeyHex)
@@ -99,6 +100,8 @@ func NewWalletFromPrivateKeyHex(privateKeyHex string) *Wallet {
 
 	var npk ecdsa.PrivateKey
 	npk.D = d
+
+	// derive public key from private key
 	npk.PublicKey.Curve = elliptic.P256()
 	npk.PublicKey.X, npk.PublicKey.Y = npk.PublicKey.Curve.ScalarBaseMult(d.Bytes())
 

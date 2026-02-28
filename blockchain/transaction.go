@@ -55,6 +55,10 @@ func (t Transaction) VerifyTxn() bool {
 	}
 
 	//TODO: check the signature
+	valid := t.VerifySignature()
+	if !valid {
+		return false
+	}
 
 	return true
 }
